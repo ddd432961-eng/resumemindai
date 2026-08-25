@@ -1,0 +1,441 @@
+/* ==========================================
+   BASE GLASS
+========================================== */
+
+.glass {
+
+  background: var(--bg-card);
+
+  border: 1px solid var(--border);
+
+  backdrop-filter: var(--blur-md);
+
+  -webkit-backdrop-filter: var(--blur-md);
+
+  box-shadow: var(--shadow-md);
+}
+
+/* ==========================================
+   STANDARD CARD
+========================================== */
+
+.glass-card {
+
+  background: var(--bg-card);
+
+  border: 1px solid var(--border);
+
+  border-radius: var(--radius-lg);
+
+  backdrop-filter: var(--blur-md);
+
+  -webkit-backdrop-filter: var(--blur-md);
+
+  box-shadow: var(--shadow-md);
+
+  transition: var(--transition);
+
+  position: relative;
+
+  overflow: hidden;
+}
+
+.glass-card:hover {
+
+  transform: translateY(-6px);
+
+  border-color: var(--border-hover);
+
+  background: var(--bg-card-hover);
+
+  box-shadow:
+    var(--shadow-lg),
+    var(--shadow-glow);
+}
+
+/* ==========================================
+   PREMIUM CARD
+========================================== */
+
+.glass-premium {
+
+  position: relative;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.08),
+      rgba(255,255,255,.03)
+    );
+
+  border: 1px solid rgba(255,255,255,.12);
+
+  border-radius: var(--radius-xl);
+
+  backdrop-filter: var(--blur-lg);
+
+  -webkit-backdrop-filter: var(--blur-lg);
+
+  box-shadow:
+    var(--shadow-lg);
+}
+
+.glass-premium::before {
+
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent,
+      rgba(255,255,255,.05),
+      transparent
+    );
+
+  transform: translateX(-100%);
+}
+
+.glass-premium:hover::before {
+
+  animation:
+    shimmer 1.2s ease;
+}
+
+/* ==========================================
+   DASHBOARD PANEL
+========================================== */
+
+.glass-panel {
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.05),
+      rgba(255,255,255,.02)
+    );
+
+  border: 1px solid var(--border);
+
+  border-radius: var(--radius-lg);
+
+  backdrop-filter: var(--blur-md);
+
+  padding: 28px;
+
+  box-shadow:
+    var(--shadow-md);
+
+  transition: var(--transition);
+}
+
+.glass-panel:hover {
+
+  border-color:
+    rgba(168,85,247,.25);
+}
+
+/* ==========================================
+   HERO PANEL
+========================================== */
+
+.glass-hero {
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.08),
+      rgba(255,255,255,.03)
+    );
+
+  border:
+    1px solid rgba(255,255,255,.10);
+
+  border-radius:
+    var(--radius-xl);
+
+  backdrop-filter:
+    var(--blur-lg);
+
+  box-shadow:
+    var(--shadow-lg);
+}
+
+/* ==========================================
+   SCORE CARD
+========================================== */
+
+.glass-score-card {
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.08),
+      rgba(255,255,255,.03)
+    );
+
+  border:
+    1px solid rgba(255,255,255,.12);
+
+  border-radius:
+    var(--radius-lg);
+
+  backdrop-filter:
+    var(--blur-lg);
+
+  box-shadow:
+    var(--shadow-lg);
+
+  position: relative;
+
+  overflow: hidden;
+}
+
+.glass-score-card::after {
+
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(168,85,247,.12),
+      transparent 70%
+    );
+
+  pointer-events: none;
+}
+
+/* ==========================================
+   INPUT GLASS
+========================================== */
+
+.glass-input {
+
+  width: 100%;
+
+  min-height: 56px;
+
+  background:
+    rgba(255,255,255,.04);
+
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    var(--radius-md);
+
+  backdrop-filter:
+    var(--blur-md);
+
+  color:
+    var(--text-primary);
+
+  padding:
+    0 18px;
+
+  transition:
+    var(--transition);
+}
+
+.glass-input:focus {
+
+  outline: none;
+
+  border-color:
+    rgba(168,85,247,.45);
+
+  box-shadow:
+    0 0 25px rgba(168,85,247,.15);
+}
+
+/* ==========================================
+   MODAL
+========================================== */
+
+.glass-modal {
+
+  background:
+    rgba(10,14,35,.85);
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  border-radius:
+    var(--radius-xl);
+
+  backdrop-filter:
+    blur(32px);
+
+  box-shadow:
+    var(--shadow-lg);
+}
+
+/* ==========================================
+   SIDEBAR
+========================================== */
+
+.glass-sidebar {
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.05),
+      rgba(255,255,255,.02)
+    );
+
+  border-right:
+    1px solid rgba(255,255,255,.08);
+
+  backdrop-filter:
+    var(--blur-lg);
+}
+
+/* ==========================================
+   NAVBAR GLASS
+========================================== */
+
+.glass-navbar {
+
+  background:
+    rgba(5,8,22,.75);
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  backdrop-filter:
+    blur(22px);
+
+  -webkit-backdrop-filter:
+    blur(22px);
+
+  box-shadow:
+    0 8px 30px rgba(0,0,0,.25);
+}
+
+/* ==========================================
+   WIDGET CARD
+========================================== */
+
+.glass-widget {
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.06),
+      rgba(255,255,255,.03)
+    );
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  border-radius:
+    var(--radius-lg);
+
+  backdrop-filter:
+    var(--blur-md);
+
+  padding:
+    24px;
+
+  transition:
+    var(--transition);
+}
+
+.glass-widget:hover {
+
+  transform:
+    translateY(-4px);
+
+  box-shadow:
+    var(--shadow-md),
+    var(--shadow-purple);
+}
+
+/* ==========================================
+   ATS RING CONTAINER
+========================================== */
+
+.glass-ring {
+
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      #050816 58%,
+      transparent 60%
+    );
+
+  overflow: hidden;
+}
+
+.glass-ring::before {
+
+  content: "";
+
+  position: absolute;
+
+  inset: -10px;
+
+  background:
+    var(--gradient-score);
+
+  animation:
+    rotateRing 8s linear infinite;
+
+  z-index: -1;
+}
+
+/* ==========================================
+   HOVER GLOW
+========================================== */
+
+.glow-border {
+
+  position: relative;
+}
+
+.glow-border::after {
+
+  content: "";
+
+  position: absolute;
+
+  inset: -1px;
+
+  border-radius: inherit;
+
+  opacity: 0;
+
+  background:
+    var(--gradient-secondary);
+
+  filter: blur(20px);
+
+  transition:
+    .4s ease;
+
+  z-index: -1;
+}
+
+.glow-border:hover::after {
+
+  opacity: .5;
+}

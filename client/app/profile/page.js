@@ -10,6 +10,8 @@ import {
   deleteUser
 } from 'firebase/auth'
 
+import '../styles/profile.css'
+
 import Navbar from '../../components/Navbar'
 import AuthGuard from '../../components/AuthGuard'
 import { auth } from '../../lib/firebase'
@@ -35,17 +37,54 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-      if (currentUser) {
-        setUser(currentUser)
-        setDisplayName(currentUser.displayName || 'ResumeMind User')
-        setEmail(currentUser.email || '')
-      }
-    })
 
+    const unsubscribe =
+      auth.onAuthStateChanged((currentUser) => {
+  
+        if (currentUser) {
+  
+          const savedUser = JSON.parse(
+            localStorage.getItem('resumemind_user') || '{}'
+          )
+  
+          const mergedUser = {
+  
+            ...currentUser,
+  
+            photoURL:
+  
+              currentUser.photoURL ||
+  
+              currentUser.providerData?.[0]?.photoURL ||
+  
+              savedUser.photoURL ||
+  
+              `https://ui-avatars.com/api/?name=${
+                encodeURIComponent(
+                  currentUser.displayName ||
+                  currentUser.email ||
+                  'User'
+                )
+              }&background=0D8ABC&color=fff`
+          }
+  
+          setUser(mergedUser)
+  
+          setDisplayName(
+            currentUser.displayName ||
+            'ResumeMind User'
+          )
+  
+          setEmail(
+            currentUser.email || ''
+          )
+        }
+      })
+  
     loadLocalData()
-
+  
     return () => unsubscribe()
+  
   }, [])
 
   const loadLocalData = () => {
@@ -282,15 +321,31 @@ export default function ProfilePage() {
           <section className="profile-page-shell">
             <div className="profile-hero-card">
               <div className="profile-hero-left">
-                <div className="profile-large-avatar">
-                  {
-                    user?.photoURL ? (
-                      <img src={user.photoURL} alt="Profile" />
-                    ) : (
-                      <span>{getInitial()}</span>
-                    )
-                  }
-                </div>
+              <div className="profile-large-avatar">
+
+  {
+    user?.photoURL ? (
+
+      <img
+        src={user.photoURL}
+        alt="Profile"
+        referrerPolicy="no-referrer"
+      />
+
+    ) : (
+
+      <span>
+        {
+          (displayName || email || 'U')
+            .charAt(0)
+            .toUpperCase()
+        }
+      </span>
+
+    )
+  }
+
+</div>
 
                 <div>
                   <p className="eyebrow">Account Center</p>

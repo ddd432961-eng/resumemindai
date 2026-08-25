@@ -7,7 +7,7 @@ import { FiUploadCloud } from 'react-icons/fi'
 import { companyRoles } from '../data/companyRoles'
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+  process.env.NEXT_PUBLIC_API_URL || 'https://resumemind-ai.onrender.com'
 
 export default function UploadBox({
   setResult,
@@ -104,6 +104,63 @@ export default function UploadBox({
     }
   })
 
+  const safeParseArray = (value) => {
+    try {
+      const parsed = JSON.parse(value)
+      return Array.isArray(parsed) ? parsed : []
+    } catch {
+      return []
+    }
+  }
+
+  const saveAnalysisToHistory = (analysisPayload, currentMeta) => {
+    const existingHistory = safeParseArray(
+      localStorage.getItem('resumemind_analysis_history') || '[]'
+    )
+
+    const report = {
+      id: `report_${Date.now()}`,
+      result: analysisPayload,
+      meta: {
+        fileName: file?.name || 'Resume Report',
+        company,
+        role,
+        jobDescription,
+        createdAt: new Date().toISOString(),
+        ...currentMeta
+      },
+      createdAt: new Date().toISOString(),
+      savedAt: new Date().toISOString()
+    }
+
+    const updatedHistory = [
+      report,
+      ...existingHistory
+    ]
+
+    localStorage.setItem(
+      'resumemind_analysis_history',
+      JSON.stringify(updatedHistory)
+    )
+
+    localStorage.setItem(
+      'resumemind_saved_reports',
+      JSON.stringify(updatedHistory)
+    )
+
+    localStorage.setItem(
+      'resumemind_latest_analysis',
+      JSON.stringify(report)
+    )
+
+    localStorage.setItem(
+      'resumemind_latest_meta',
+      JSON.stringify(report.meta)
+    )
+
+    return report
+  }
+
   const handleCompanyChange = (selectedCompany) => {
     const selectedData = companyRoles.find(
       (item) => item.company === selectedCompany
@@ -122,6 +179,67 @@ export default function UploadBox({
     setOpenRoleDropdown(false)
   }
 
+  const getErrorMessage = (error) => {
+    if (error?.code === 'ECONNABORTED') {
+      return 'Backend is taking too long. Render may be waking up. Please try again in a few seconds.'
+    }
+
+    if (error?.response?.data?.message) {
+      return error.response.data.message
+    }
+
+    if (error?.response?.data?.error) {
+      return error.response.data.error
+    }
+
+    if (typeof error?.response?.data === 'string') {
+      return error.response.data
+    }
+
+    if (error?.message) {
+      return error.message
+    }
+
+    return 'Analysis Failed. Please try again.'
+  }
+
+  const normalizeBackendAnalysis = (data) => {
+    if (data?.analysis) {
+      return data.analysis
+    }
+
+    if (data?.result) {
+      return data.result
+    }
+
+    if (data?.data?.analysis) {
+      return data.data.analysis
+    }
+
+    if (data?.data?.result) {
+      return data.data.result
+    }
+
+    return data
+  }
+
+  const hasValidAnalysis = (analysis) => {
+    if (!analysis || typeof analysis !== 'object') {
+      return false
+    }
+
+    return Boolean(
+      analysis.atsScore ||
+      analysis.score ||
+      analysis.overallScore ||
+      analysis.summary ||
+      analysis.aiSummary ||
+      analysis.suggestions ||
+      analysis.missingSkills ||
+      analysis.matchedSkills
+    )
+  }
+
   const handleAnalyze = async () => {
     if (!file) {
       alert('Upload Resume First')
@@ -132,9 +250,11 @@ export default function UploadBox({
       setLoading(true)
 
       const currentMeta = {
+        fileName: file?.name || 'Resume Report',
         company,
         role,
-        jobDescription
+        jobDescription,
+        createdAt: new Date().toISOString()
       }
 
       if (setAnalysisMeta) {
@@ -163,38 +283,44 @@ export default function UploadBox({
         {
           headers: {
             'Content-Type': 'multipart/form-data'
-          }
+          },
+          timeout: 120000
         }
       )
 
-      if (response.data?.success && response.data?.analysis) {
-        const analysisPayload = {
-          ...response.data.analysis,
-          selectedCompany: company,
-          selectedRole: role,
-          jobDescription
-        }
+      const analysisFromBackend = normalizeBackendAnalysis(response.data)
 
-        setResult(analysisPayload)
-
-        localStorage.setItem(
-          'resumemind_latest_analysis',
-          JSON.stringify({
-            result: analysisPayload,
-            meta: currentMeta,
-            savedAt: new Date().toISOString()
-          })
-        )
-      } else {
-        alert('Analysis completed but no result was returned.')
+      if (!hasValidAnalysis(analysisFromBackend)) {
+        console.error('Unexpected backend response:', response.data)
+        alert('Analysis completed but backend returned an unexpected format.')
+        return
       }
-    } catch (error) {
-      console.log(error)
 
-      alert(
-        error?.response?.data?.message ||
-        'Analysis Failed. Please try again.'
-      )
+      const analysisPayload = {
+        ...analysisFromBackend,
+        atsScore:
+          analysisFromBackend.atsScore ||
+          analysisFromBackend.score ||
+          analysisFromBackend.overallScore ||
+          0,
+        selectedCompany: company,
+        selectedRole: role,
+        company,
+        role,
+        jobDescription,
+        fileName: file?.name || 'Resume Report'
+      }
+
+      setResult(analysisPayload)
+
+      saveAnalysisToHistory(analysisPayload, currentMeta)
+
+      alert('Analysis completed successfully.')
+    } catch (error) {
+      console.error('Analysis failed:', error)
+      console.error('Backend response:', error?.response?.data)
+
+      alert(getErrorMessage(error))
     } finally {
       setLoading(false)
     }
@@ -204,14 +330,14 @@ export default function UploadBox({
     <div className="upload-wrapper">
       <div className="upload-header">
         <div className="uploadbox-header">
-  <span className="eyebrow">
-    Upload & Analyze
-  </span>
+          <span className="eyebrow">
+            Upload & Analyze
+          </span>
 
-  <p>
-    Add your resume details below to generate ATS, skill gap, and company-role insights.
-  </p>
-</div>
+          <p>
+            Add your resume details below to generate ATS, skill gap, and company-role insights.
+          </p>
+        </div>
       </div>
 
       <div
@@ -271,31 +397,29 @@ export default function UploadBox({
                 />
 
                 <div className="dropdown-scroll">
-                  {
-                    filteredCompanies.length > 0 ? (
-                      filteredCompanies.map((item) => (
-                        <button
-                          key={item.company}
-                          type="button"
-                          className={`dropdown-item ${
-                            company === item.company ? 'active' : ''
-                          }`}
-                          onClick={() => handleCompanyChange(item.company)}
-                        >
-                          <span>{item.company}</span>
+                  {filteredCompanies.length > 0 ? (
+                    filteredCompanies.map((item) => (
+                      <button
+                        key={item.company}
+                        type="button"
+                        className={`dropdown-item ${
+                          company === item.company ? 'active' : ''
+                        }`}
+                        onClick={() => handleCompanyChange(item.company)}
+                      >
+                        <span>{item.company}</span>
 
-                          <small>
-                            {item.type || 'Company'}
-                            {item.category ? ` • ${item.category}` : ''}
-                          </small>
-                        </button>
-                      ))
-                    ) : (
-                      <div className="dropdown-empty">
-                        No company found
-                      </div>
-                    )
-                  }
+                        <small>
+                          {item.type || 'Company'}
+                          {item.category ? ` • ${item.category}` : ''}
+                        </small>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="dropdown-empty">
+                      No company found
+                    </div>
+                  )}
                 </div>
               </div>
             ) : null}
@@ -332,26 +456,24 @@ export default function UploadBox({
                 />
 
                 <div className="dropdown-scroll">
-                  {
-                    filteredRoles.length > 0 ? (
-                      filteredRoles.map((item) => (
-                        <button
-                          key={item}
-                          type="button"
-                          className={`dropdown-item ${
-                            role === item ? 'active' : ''
-                          }`}
-                          onClick={() => handleRoleChange(item)}
-                        >
-                          <span>{item}</span>
-                        </button>
-                      ))
-                    ) : (
-                      <div className="dropdown-empty">
-                        No role found for this company
-                      </div>
-                    )
-                  }
+                  {filteredRoles.length > 0 ? (
+                    filteredRoles.map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        className={`dropdown-item ${
+                          role === item ? 'active' : ''
+                        }`}
+                        onClick={() => handleRoleChange(item)}
+                      >
+                        <span>{item}</span>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="dropdown-empty">
+                      No role found for this company
+                    </div>
+                  )}
                 </div>
               </div>
             ) : null}
@@ -367,7 +489,7 @@ export default function UploadBox({
         <textarea
           placeholder="Paste job description here to get accurate role-based skill matching..."
           value={jobDescription}
-          onChange={(e) => setJobDescription(e.target.value)}
+          onChange={(event) => setJobDescription(event.target.value)}
           rows={8}
         />
       </div>

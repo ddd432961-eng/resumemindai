@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 
 import Navbar from '../../components/Navbar'
-import ProfileMenu from '../../components/ProfileMenu'
 import ATSCard from '../../components/ATSCard'
 import UploadBox from '../../components/UploadBox'
 import SkillChart from '../../components/SkillChart'
@@ -853,6 +852,39 @@ export default function Dashboard() {
     })
   }
 
+  const openReportOnDashboard = (item) => {
+    if (!item) return
+
+    localStorage.setItem(
+      'resumemind_latest_analysis',
+      JSON.stringify(item)
+    )
+
+    localStorage.setItem(
+      'resumemind_latest_meta',
+      JSON.stringify({
+        ...(item.meta || {}),
+        savedAt: item.savedAt || new Date().toISOString()
+      })
+    )
+
+    if (item.result) {
+      setResult(item.result)
+    }
+
+    if (item.meta) {
+      setAnalysisMeta((previous) => ({
+        ...previous,
+        ...item.meta
+      }))
+    }
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  }
+
   const generateProfileSummary = () => {
     if (!result) return
 
@@ -1068,55 +1100,181 @@ export default function Dashboard() {
 
         <div className="container">
           <Navbar />
-          <ProfileMenu />
+          <section className="pro-dashboard-hero">
 
-          <section className="dashboard-hero pro-dashboard-hero">
-            <div className="hero-content">
-              <span className="eyebrow">
-                AI Resume Intelligence Platform
-              </span>
+  <div className="hero-content">
 
-              <h1 className="dashboard-title">
-                Build a job-ready resume with AI-powered insights
-              </h1>
+    <span className="hero-tag">
+      <div className="hero-badge">
+  AI RESUME PLATFORM
+</div>
+    </span>
 
-              <p className="dashboard-subtitle">
-                Analyze ATS score, company-role match, hiring probability,
-                missing skills, project strength, job description match, and
-                generate a cleaner ATS-friendly resume.
-              </p>
+    <h1 className="hero-title">
+  Build a resume
+  <br />
 
-              <div className="hero-actions">
-                <a href="#analyzer" className="button">
-                  Start Resume Analysis
-                </a>
+  that beats
 
-                <Link href="/templates" className="button secondary-btn">
-                  Browse Templates
-                </Link>
-              </div>
-            </div>
+  <span> ATS </span>
 
-            <div className="hero-score-card">
-              <div className="score-ring">
-                <span>
-                  {result ? `${resumeHealth.overall}%` : '0%'}
-                </span>
-              </div>
+  <br />
 
-              <h3>
-                Resume Health
-              </h3>
+  and matches your
 
-              <p>
-                {
-                  result
-                    ? `${getScoreLabel(resumeHealth.overall)} health for ${analysisMeta.role}`
-                    : 'Upload your resume to calculate ATS, keyword, formatting, skill, and readability scores.'
-                }
-              </p>
-            </div>
-          </section>
+  <br />
+
+  <span>dream role</span>
+</h1>
+
+    <p className="hero-description">
+
+Analyze ATS score, company match,
+hiring probability, missing skills,
+resume quality and generate an
+ATS-friendly resume using AI.
+
+</p>
+
+
+
+    <div className="hero-actions">
+
+      <button
+        className="primary-btn"
+        onClick={() => {
+
+          document
+            .getElementById("analyzer")
+            ?.scrollIntoView({
+              behavior: "smooth",
+            });
+
+        }}
+      >
+        Analyze Resume
+      </button>
+
+      <Link
+        href="/templates"
+        className="secondary-btn"
+      >
+        Browse Templates
+      </Link>
+
+    </div>
+
+  </div>
+
+  <div className="hero-score-card">
+
+    <div className="score-ring">
+
+      <span>
+
+        {result
+          ? `${resumeHealth.overall}%`
+          : "92%"}
+
+      </span>
+
+    </div>
+
+    <h2>
+
+      Resume Health Score
+
+    </h2>
+
+    <p>
+
+      {
+        result
+          ? "Calculated from ATS, keywords, projects and readability."
+          : "Upload your resume to calculate your ATS score."
+      }
+
+    </p>
+
+    <div className="score-stats">
+
+      <div className="score-stat">
+
+        <span>
+          ATS Formatting
+        </span>
+
+        <strong>
+
+          {
+            result
+              ? `${resumeHealth.formattingScore}%`
+              : "90%"
+          }
+
+        </strong>
+
+      </div>
+
+      <div className="score-stat">
+
+        <span>
+          Keyword Match
+        </span>
+
+        <strong>
+
+          {
+            result
+              ? `${resumeHealth.keywordMatch}%`
+              : "88%"
+          }
+
+        </strong>
+
+      </div>
+
+      <div className="score-stat">
+
+        <span>
+          Content Quality
+        </span>
+
+        <strong>
+
+          {
+            result
+              ? `${resumeHealth.readabilityScore}%`
+              : "91%"
+          }
+
+        </strong>
+
+      </div>
+
+      <div className="score-stat">
+
+        <span>
+          Project Strength
+        </span>
+
+        <strong>
+
+          {
+            result
+              ? `${resumeHealth.projectStrength}%`
+              : "89%"
+          }
+
+        </strong>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
 
           <section className="dashboard-feature-grid">
             <div className="mini-feature-card">
@@ -1362,10 +1520,11 @@ export default function Dashboard() {
                     <div className="recent-report-list">
                       {
                         recentReports.map((item) => (
-                          <Link
-                            href={`/report/${item.id}`}
-                            className="recent-report-item"
+                          <button
+                            type="button"
+                            className="recent-report-item recent-report-button"
                             key={item.id}
+                            onClick={() => openReportOnDashboard(item)}
                           >
                             <div>
                               <h3>
@@ -1380,7 +1539,7 @@ export default function Dashboard() {
                             <strong>
                               {getReportScore(item)}%
                             </strong>
-                          </Link>
+                          </button>
                         ))
                       }
 
@@ -1421,6 +1580,7 @@ export default function Dashboard() {
           >
             <UploadBox
               setResult={handleSetResult}
+              analysisMeta={analysisMeta}
               setAnalysisMeta={handleSetAnalysisMeta}
             />
           </section>
@@ -1478,6 +1638,94 @@ export default function Dashboard() {
                     />
                   </div>
                 </section>
+                <section className="dashboard-section">
+  <div className="section-heading left">
+    <span className="eyebrow">
+      Workspace Shortcuts
+    </span>
+
+    <h2>
+      Continue your resume workflow
+    </h2>
+
+    <p>
+      Access saved resumes, reports, editor tools, and skill intelligence from one place.
+    </p>
+  </div>
+
+  <div className="quick-actions-grid">
+    <Link href="/resumes" className="quick-action-card">
+      <span className="quick-action-icon">
+        📄
+      </span>
+
+      <strong>
+        Saved Resumes
+      </strong>
+
+      <p>
+        View, manage, and continue improved resumes generated from your analysis.
+      </p>
+    </Link>
+
+    <Link href="/reports" className="quick-action-card">
+      <span className="quick-action-icon">
+        📑
+      </span>
+
+      <strong>
+        Reports
+      </strong>
+
+      <p>
+        Open saved ATS reports, company match results, and resume insights.
+      </p>
+    </Link>
+
+    <Link href="/editor" className="quick-action-card">
+      <span className="quick-action-icon">
+        ✍️
+      </span>
+
+      <strong>
+        Resume Editor
+      </strong>
+
+      <p>
+        Improve resume sections, rewrite content, and prepare export-ready resumes.
+      </p>
+    </Link>
+
+    <Link href="/skills" className="quick-action-card">
+      <span className="quick-action-icon">
+        🧠
+      </span>
+
+      <strong>
+        Skill Intelligence
+      </strong>
+
+      <p>
+        Track missing skills, keywords, role readiness, and improvement priorities.
+      </p>
+    </Link>
+    <Link href="/history" className="quick-action-card">
+
+  <span className="quick-action-icon">
+    📂
+  </span>
+
+  <strong>
+    Analysis History
+  </strong>
+
+  <p>
+    Revisit previous ATS analyses, reports, and resume optimization sessions.
+  </p>
+
+</Link>
+  </div>
+</section>
 
                 <section className="resume-health-section">
                   <div className="section-heading left">
@@ -1806,31 +2054,40 @@ export default function Dashboard() {
                       )}
                     </div>
 
-                    <div className="card result-card roadmap-card">
-                      <span className="template-tag">
-                        Roadmap
-                      </span>
+                  </div>
+                </section>
 
-                      <h2>
-                        Role-Based Learning Roadmap
-                      </h2>
+                <section className="roadmap-section">
+                  <div className="section-heading left">
+                    <span className="eyebrow">
+                      Roadmap
+                    </span>
 
-                      <div className="roadmap-list">
-                        {
-                          roadmap.map((item, index) => (
-                            <div className="roadmap-item" key={index}>
-                              <span>
-                                {index + 1}
-                              </span>
+                    <h2>
+                      Role-Based Learning Roadmap
+                    </h2>
 
-                              <p>
-                                {item}
-                              </p>
-                            </div>
-                          ))
-                        }
-                      </div>
-                    </div>
+                    <p>
+                      Follow these role-based learning steps to strengthen your technical skills, resume, and interview readiness.
+                    </p>
+                  </div>
+
+                  <div className="roadmap-grid">
+                    {
+                      roadmap.map((item, index) => (
+                        <div className="roadmap-item" key={index}>
+                          <span className="roadmap-number">
+                            {index + 1}
+                          </span>
+
+                          <div className="roadmap-copy">
+                            <p>
+                              {item}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    }
                   </div>
                 </section>
 

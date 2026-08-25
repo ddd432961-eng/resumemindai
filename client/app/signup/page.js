@@ -3,16 +3,21 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-
+import PublicRoute from '../../components/PublicRoute'
 import Navbar from '../../components/Navbar'
-
+import Signup from "../styles/signup.css";
 import {
   auth,
   googleProvider,
+  microsoftProvider,
   createUserWithEmailAndPassword,
   signInWithPopup,
-  updateProfile
+  updateProfile,
+  fetchSignInMethodsForEmail,
+  sendEmailVerification
 } from '../../lib/firebase'
+
+import { validateSignupDetails } from '../../lib/validation'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -25,6 +30,7 @@ export default function SignupPage() {
   })
 
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleChange = (event) => {
@@ -36,7 +42,7 @@ export default function SignupPage() {
     }))
   }
 
-  const saveSession = (firebaseUser, provider = 'email') => {
+  const saveSession = (firebaseUser, provider = 'email', forceVerified = false) => {
     const sessionUser = {
       uid: firebaseUser.uid,
       email: firebaseUser.email,
@@ -47,23 +53,17 @@ export default function SignupPage() {
         'User',
       photoURL: firebaseUser.photoURL || '',
       provider,
+      emailVerified:
+        forceVerified ||
+        provider === 'google' ||
+        provider === 'microsoft' ||
+        Boolean(firebaseUser.emailVerified),
       loggedInAt: new Date().toISOString()
     }
 
-    localStorage.setItem(
-      'resumemind_session',
-      JSON.stringify(sessionUser)
-    )
-
-    localStorage.setItem(
-      'resumemind_user_profile',
-      JSON.stringify(sessionUser)
-    )
-
-    localStorage.setItem(
-      'resumemind_user',
-      JSON.stringify(sessionUser)
-    )
+    localStorage.setItem('resumemind_session', JSON.stringify(sessionUser))
+    localStorage.setItem('resumemind_user_profile', JSON.stringify(sessionUser))
+    localStorage.setItem('resumemind_user', JSON.stringify(sessionUser))
   }
 
   const getFirebaseErrorMessage = (code) => {
@@ -76,19 +76,27 @@ export default function SignupPage() {
     }
 
     if (code === 'auth/weak-password') {
-      return 'Password should be at least 6 characters.'
+      return 'Please create a stronger password.'
     }
 
     if (code === 'auth/popup-closed-by-user') {
-      return 'Google signup was cancelled. Please try again.'
+      return 'Signup was cancelled. Please try again.'
     }
 
     if (code === 'auth/cancelled-popup-request') {
-      return 'Another Google popup was already opened. Please try again.'
+      return 'Another popup was already opened. Please try again.'
     }
 
     if (code === 'auth/popup-blocked') {
       return 'Popup was blocked. Please allow popups and try again.'
+    }
+
+    if (code === 'auth/account-exists-with-different-credential') {
+      return 'This email is already registered with another login method. Please use the original login method.'
+    }
+
+    if (code === 'auth/too-many-requests') {
+      return 'Firebase temporarily blocked verification emails due to too many attempts. Please wait a few minutes and try again.'
     }
 
     if (code === 'auth/network-request-failed') {
@@ -101,38 +109,62 @@ export default function SignupPage() {
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError('')
+    setSuccess('')
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match.')
-      return
-    }
+    const validationError = validateSignupDetails({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      confirmPassword: formData.confirmPassword
+    })
 
-    if (formData.password.length < 6) {
-      setError('Password should be at least 6 characters.')
+    if (validationError) {
+      setError(validationError)
       return
     }
 
     setLoading(true)
 
     try {
+      const cleanEmail = formData.email.trim().toLowerCase()
+      const cleanName = formData.name.trim()
+
+      const methods = await fetchSignInMethodsForEmail(auth, cleanEmail)
+
+      if (methods.length > 0) {
+        setError('This email is already registered. Please login instead.')
+        setLoading(false)
+        return
+      }
+
       const response = await createUserWithEmailAndPassword(
         auth,
-        formData.email.trim().toLowerCase(),
+        cleanEmail,
         formData.password
       )
 
       await updateProfile(response.user, {
-        displayName: formData.name.trim()
+        displayName: cleanName
       })
+
+      await sendEmailVerification(response.user)
 
       const updatedUser = {
         ...response.user,
-        displayName: formData.name.trim()
+        displayName: cleanName,
+        emailVerified: false
       }
 
-      saveSession(updatedUser, 'email')
-      router.push('/dashboard')
+      saveSession(updatedUser, 'email', false)
+
+      setSuccess(
+        `Verification email sent to ${response.user.email}. Please check your inbox.`
+      )
+
+      router.push('/verify-email')
     } catch (error) {
+      console.error('Signup error:', error)
+
       setError(getFirebaseErrorMessage(error.code))
     } finally {
       setLoading(false)
@@ -140,191 +172,235 @@ export default function SignupPage() {
   }
 
   const handleGoogleSignup = async () => {
-    setError('')
-    setLoading(true)
+  if (loading) return
 
-    try {
-      const response = await signInWithPopup(auth, googleProvider)
+  setError('')
+  setSuccess('')
+  setLoading(true)
 
-      saveSession(response.user, 'google')
-      router.push('/dashboard')
-    } catch (error) {
-      if (error.code === 'auth/popup-closed-by-user') {
-        setError('Google signup was cancelled. Please try again.')
-        return
-      }
+  try {
+    const response = await signInWithPopup(
+      auth,
+      googleProvider
+    )
 
-      if (error.code === 'auth/cancelled-popup-request') {
-        setError('Another Google popup was already opened. Please try again.')
-        return
-      }
+    saveSession(response.user, 'google', true)
+    router.push('/dashboard')
+  } catch (error) {
 
-      if (error.code === 'auth/popup-blocked') {
-        setError('Popup was blocked. Please allow popups and try again.')
-        return
-      }
-
-      setError(getFirebaseErrorMessage(error.code))
-    } finally {
-      setLoading(false)
+    if (error.code === 'auth/cancelled-popup-request') {
+      return
     }
+
+    console.error('Google signup error:', error)
+    setError(getFirebaseErrorMessage(error.code))
+  } finally {
+    setLoading(false)
   }
+}
 
+  const handleMicrosoftSignup = async () => {
+  if (loading) return
+
+  setError('')
+  setSuccess('')
+  setLoading(true)
+
+  try {
+    const response = await signInWithPopup(
+      auth,
+      microsoftProvider
+    )
+
+    saveSession(response.user, 'microsoft', true)
+    router.push('/dashboard')
+  } catch (error) {
+
+    if (error.code === 'auth/cancelled-popup-request') {
+      return
+    }
+
+    console.error('Microsoft signup error:', error)
+    setError(getFirebaseErrorMessage(error.code))
+  } finally {
+    setLoading(false)
+  }
+}
   return (
-    <main className="page">
-      <div className="glow one"></div>
-      <div className="glow two"></div>
-      <div className="glow three"></div>
+    <PublicRoute>
+      <main className="page">
+        <div className="glow one"></div>
+        <div className="glow two"></div>
+        <div className="glow three"></div>
 
-      <div className="container">
-        <Navbar />
+        <div className="container">
+          <Navbar />
 
-        <section className="auth-layout">
-          <div className="auth-copy">
-            <span className="eyebrow">
-              Start Your Journey
-            </span>
+          <section className="auth-layout">
+            <div className="auth-copy">
+              <span className="eyebrow">
+                Start Your Journey
+              </span>
 
-            <h1>
-              Create your ResumeMind AI account
-            </h1>
+              <h1>
+                Create your ResumeMind AI account
+              </h1>
 
-            <p>
-              Sign up to analyze resumes, track ATS scores, compare company
-              matches, save reports, and build improved resumes.
-            </p>
+              <p>
+                Sign up to analyze resumes, track ATS scores, compare company
+                matches, save reports, and build improved resumes.
+              </p>
 
-            <div className="auth-feature-list">
-              <span>🚀 AI Resume Analyzer</span>
-              <span>🎯 ATS Score Tracking</span>
-              <span>🏢 Company Match Reports</span>
-              <span>📄 Resume Builder</span>
+              <div className="auth-feature-list">
+                <span>🚀 AI Resume Analyzer</span>
+                <span>🎯 ATS Score Tracking</span>
+                <span>🏢 Company Match Reports</span>
+                <span>📄 Resume Builder</span>
+              </div>
             </div>
-          </div>
 
-          <div className="auth-card">
-            <span className="auth-icon">
-              ✨
-            </span>
+            <div className="auth-card">
+              <span className="auth-icon">
+                ✨
+              </span>
 
-            <h2>
-              Signup
-            </h2>
+              <h2>
+                Signup
+              </h2>
 
-            <p>
-              Create your account to access your AI resume dashboard.
-            </p>
+              <p>
+                Create your account using Google, Outlook, or a verified trusted email.
+              </p>
 
-            {
-              error ? (
+              {error ? (
                 <div className="auth-error">
                   {error}
                 </div>
-              ) : null
-            }
+              ) : null}
 
-            <button
-              type="button"
-              className="google-login-btn"
-              onClick={handleGoogleSignup}
-              disabled={loading}
-            >
-              <span className="google-icon">
-                G
-              </span>
-
-              {loading ? 'Please wait...' : 'Continue with Google'}
-            </button>
-
-            <div className="auth-divider">
-              <span></span>
-
-              <p>
-                or signup with email
-              </p>
-
-              <span></span>
-            </div>
-
-            <form onSubmit={handleSubmit} className="auth-form">
-              <div className="form-group">
-                <label>
-                  Full Name
-                </label>
-
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Enter your full name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>
-                  Email
-                </label>
-
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>
-                  Password
-                </label>
-
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Create password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>
-                  Confirm Password
-                </label>
-
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  placeholder="Confirm password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+              {success ? (
+                <div className="auth-success">
+                  {success}
+                </div>
+              ) : null}
 
               <button
-                type="submit"
-                className="button auth-submit"
+                type="button"
+                className="google-login-btn"
+                onClick={handleGoogleSignup}
                 disabled={loading}
               >
-                {loading ? 'Creating account...' : 'Create Account'}
-              </button>
-            </form>
+                <span className="google-icon">
+                  G
+                </span>
 
-            <p className="auth-switch">
-              Already have an account?{' '}
-              <Link href="/login">
-                Login
-              </Link>
-            </p>
-          </div>
-        </section>
-      </div>
-    </main>
+                {loading ? 'Please wait...' : 'Continue with Google'}
+              </button>
+
+              <button
+                type="button"
+                className="google-login-btn"
+                onClick={handleMicrosoftSignup}
+                disabled={loading}
+                style={{ marginTop: '12px' }}
+              >
+                <span className="google-icon">
+                  M
+                </span>
+
+                {loading ? 'Please wait...' : 'Continue with Outlook'}
+              </button>
+
+              <div className="auth-divider">
+                <span></span>
+
+                <p>
+                  or signup with trusted email
+                </p>
+
+                <span></span>
+              </div>
+
+              <form onSubmit={handleSubmit} className="auth-form">
+                <div className="form-group">
+                  <label>
+                    Full Name
+                  </label>
+
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Enter your full name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>
+                    Email
+                  </label>
+
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="example@gmail.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>
+                    Password
+                  </label>
+
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="Create strong password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>
+                    Confirm Password
+                  </label>
+
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    placeholder="Confirm password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="button auth-submit"
+                  disabled={loading}
+                >
+                  {loading ? 'Creating account...' : 'Create Account'}
+                </button>
+              </form>
+
+              <p className="auth-switch">
+                Already have an account?{' '}
+                <Link href="/login">
+                  Login
+                </Link>
+              </p>
+            </div>
+          </section>
+        </div>
+      </main>
+    </PublicRoute>
   )
 }

@@ -1,0 +1,188 @@
+/* ==========================================
+   RESUMEMIND AI DESIGN SYSTEM
+========================================== */
+
+:root {
+
+  /* ==========================================
+     BRAND COLORS
+  ========================================== */
+
+  --blue-300: #93c5fd;
+  --blue-400: #60a5fa;
+  --blue-500: #3b82f6;
+
+  --purple-300: #c4b5fd;
+  --purple-400: #a78bfa;
+  --purple-500: #8b5cf6;
+
+  --pink-300: #f9a8d4;
+  --pink-400: #f472b6;
+  --pink-500: #ec4899;
+
+  /* ==========================================
+     STATUS COLORS
+  ========================================== */
+
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+
+  --success-light: #86efac;
+  --warning-light: #fde68a;
+  --danger-light: #fca5a5;
+
+  /* ==========================================
+     BACKGROUNDS
+  ========================================== */
+
+  --bg-primary: #050816;
+
+  --bg-secondary: #0b1023;
+
+  --bg-tertiary: #121a35;
+
+  --bg-card:
+    rgba(11,16,35,.78);
+
+  --bg-card-hover:
+    rgba(16,22,45,.88);
+
+  --bg-glass:
+    rgba(255,255,255,.04);
+
+  /* ==========================================
+     TEXT
+  ========================================== */
+
+  --text-primary: #ffffff;
+
+  --text-secondary: #cbd5e1;
+
+  --text-muted: #94a3b8;
+
+  /* ==========================================
+     BORDERS
+  ========================================== */
+
+  --border:
+    rgba(255,255,255,.08);
+
+  --border-hover:
+    rgba(255,255,255,.14);
+
+  /* ==========================================
+     GRADIENTS
+  ========================================== */
+
+  --gradient-primary:
+    linear-gradient(
+      135deg,
+      #3b82f6,
+      #8b5cf6
+    );
+
+  --gradient-secondary:
+    linear-gradient(
+      135deg,
+      #3b82f6,
+      #8b5cf6,
+      #ec4899
+    );
+
+  --gradient-score:
+    linear-gradient(
+      135deg,
+      #38bdf8,
+      #6366f1,
+      #d946ef
+    );
+
+  --gradient-success:
+    linear-gradient(
+      135deg,
+      #22c55e,
+      #4ade80
+    );
+
+  /* ==========================================
+     GLASS
+  ========================================== */
+
+  --blur-sm:
+    blur(6px);
+
+  --blur-md:
+    blur(12px);
+
+  --blur-lg:
+    blur(16px);
+
+  /* ==========================================
+     RADIUS
+  ========================================== */
+
+  --radius-sm: 12px;
+
+  --radius-md: 18px;
+
+  --radius-lg: 24px;
+
+  --radius-xl: 28px;
+
+  /* ==========================================
+     SHADOWS
+  ========================================== */
+
+  --shadow-sm:
+    0 4px 12px rgba(0,0,0,.12);
+
+  --shadow-md:
+    0 10px 30px rgba(0,0,0,.18);
+
+  --shadow-lg:
+    0 18px 45px rgba(0,0,0,.24);
+
+  --shadow-blue:
+    0 0 35px rgba(59,130,246,.18);
+
+  --shadow-purple:
+    0 0 35px rgba(168,85,247,.18);
+
+  /* ==========================================
+     SPACING
+  ========================================== */
+
+  --space-xs: .5rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 5rem;
+
+  /* ==========================================
+     TYPOGRAPHY
+  ========================================== */
+
+  --font-xs: .75rem;
+  --font-sm: .875rem;
+  --font-md: 1rem;
+  --font-lg: 1.125rem;
+  --font-xl: 1.5rem;
+  --font-2xl: 2rem;
+  --font-3xl: 3rem;
+  --font-4xl: 4rem;
+
+  /* ==========================================
+     TRANSITIONS
+  ========================================== */
+
+  --transition-fast:
+    all .18s ease;
+
+  --transition:
+    all .28s cubic-bezier(.4,0,.2,1);
+
+  --transition-slow:
+    all .4s ease;
+}

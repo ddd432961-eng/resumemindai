@@ -1,0 +1,273 @@
+/* ==================================================
+   ResumeMind AI
+   Premium Animation System
+================================================== */
+
+/* Fade Up */
+
+@keyframes fadeUp{
+
+    from{
+        opacity:0;
+        transform:translateY(40px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+/* Fade Down */
+
+@keyframes fadeDown{
+
+    from{
+        opacity:0;
+        transform:translateY(-40px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+/* Fade Left */
+
+@keyframes fadeLeft{
+
+    from{
+        opacity:0;
+        transform:translateX(-40px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateX(0);
+    }
+
+}
+
+/* Fade Right */
+
+@keyframes fadeRight{
+
+    from{
+        opacity:0;
+        transform:translateX(40px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateX(0);
+    }
+
+}
+
+/* Scale */
+
+@keyframes scaleIn{
+
+    from{
+        opacity:0;
+        transform:scale(.85);
+    }
+
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+
+}
+
+/* Floating */
+
+@keyframes floating{
+
+    0%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-12px);
+    }
+
+    100%{
+        transform:translateY(0);
+    }
+
+}
+
+/* Gradient Animation */
+
+@keyframes gradientMove{
+
+    0%{
+        background-position:0%;
+    }
+
+    100%{
+        background-position:200%;
+    }
+
+}
+
+/* Pulse */
+
+@keyframes pulse{
+
+    0%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.05);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+
+}
+
+/* Glow */
+
+@keyframes glow{
+
+    0%{
+        box-shadow:0 0 0 rgba(139,92,246,.15);
+    }
+
+    50%{
+        box-shadow:0 0 40px rgba(139,92,246,.35);
+    }
+
+    100%{
+        box-shadow:0 0 0 rgba(139,92,246,.15);
+    }
+
+}
+
+/* Shine */
+
+@keyframes shine{
+
+    from{
+        transform:translateX(-120%);
+    }
+
+    to{
+        transform:translateX(120%);
+    }
+
+}
+
+.fade-up{
+    animation:fadeUp .8s ease both;
+}
+
+.fade-down{
+    animation:fadeDown .8s ease both;
+}
+
+.fade-left{
+    animation:fadeLeft .8s ease both;
+}
+
+.fade-right{
+    animation:fadeRight .8s ease both;
+}
+
+.scale-in{
+    animation:scaleIn .8s ease both;
+}
+
+.float{
+    animation:floating 6s ease-in-out infinite;
+}
+
+.glow{
+    animation:glow 3s infinite;
+}
+
+
+.hover-lift{
+
+    transition:.35s ease;
+
+}
+
+.hover-lift:hover{
+
+    transform:translateY(-10px);
+
+}
+
+.hover-scale{
+
+    transition:.35s ease;
+
+}
+
+.hover-scale:hover{
+
+    transform:scale(1.04);
+
+}
+
+.hover-glow{
+
+    transition:.35s ease;
+
+}
+
+.hover-glow:hover{
+
+    box-shadow:
+
+        0 25px 60px rgba(139,92,246,.28);
+
+}
+
+.shimmer{
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+.shimmer::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+
+        linear-gradient(
+
+            110deg,
+
+            transparent,
+
+            rgba(255,255,255,.10),
+
+            transparent
+
+        );
+
+    transform:translateX(-120%);
+
+}
+
+.shimmer:hover::before{
+
+    animation:shine 1.2s linear;
+
+}

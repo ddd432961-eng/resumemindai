@@ -1,0 +1,629 @@
+/* ==========================================
+   COMPANY MATCH PAGE
+========================================== */
+
+.company-match-page {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 32px;
+
+  padding-top: 20px;
+
+  animation:
+    fadeUp .8s ease;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.company-match-header {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 24px;
+}
+
+.company-match-header h1 {
+
+  font-size:
+    clamp(
+      2.5rem,
+      5vw,
+      4rem
+    );
+
+  margin-bottom: 12px;
+}
+
+.company-match-header p {
+
+  max-width: 700px;
+}
+
+/* ==========================================
+   MATCH HERO
+========================================== */
+
+.match-hero {
+
+  position: relative;
+
+  overflow: hidden;
+
+  display: grid;
+
+  grid-template-columns:
+    260px
+    1fr;
+
+  gap: 40px;
+
+  padding: 40px;
+
+  border-radius:
+    var(--radius-xl);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(59,130,246,.08),
+      rgba(168,85,247,.08)
+    );
+
+  border:
+    1px solid rgba(255,255,255,.08);
+}
+
+/* ==========================================
+   MATCH SCORE RING
+========================================== */
+
+.match-score-ring {
+
+  position: relative;
+
+  width: 210px;
+
+  height: 210px;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background:
+    radial-gradient(
+      circle,
+      var(--bg-primary) 58%,
+      transparent 60%
+    );
+}
+
+.match-score-ring::before {
+
+  content: "";
+
+  position: absolute;
+
+  inset: -8px;
+
+  border-radius: 50%;
+
+  background:
+    var(--gradient-score);
+
+  z-index: -1;
+
+  animation:
+    rotateRing 10s linear infinite;
+}
+
+.match-score-ring span {
+
+  font-size: 3.5rem;
+
+  font-weight: 900;
+}
+
+/* ==========================================
+   HERO CONTENT
+========================================== */
+
+.match-hero-content {
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+}
+
+.match-hero-content h2 {
+
+  font-size: 2rem;
+
+  margin-bottom: 14px;
+}
+
+.match-hero-content p {
+
+  max-width: 700px;
+}
+
+/* ==========================================
+   SEARCH PANEL
+========================================== */
+
+.company-search {
+
+  padding: 28px;
+
+  border-radius:
+    var(--radius-lg);
+
+  background:
+    rgba(255,255,255,.03);
+
+  border:
+    1px solid rgba(255,255,255,.06);
+}
+
+/* ==========================================
+   COMPANY GRID
+========================================== */
+
+.company-grid {
+
+  display: grid;
+
+  gap: 24px;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(360px,1fr)
+    );
+}
+
+/* ==========================================
+   COMPANY CARD
+========================================== */
+
+.company-card {
+
+  position: relative;
+
+  overflow: hidden;
+
+  padding: 28px;
+
+  transition:
+    var(--transition);
+}
+
+.company-card:hover {
+
+  transform:
+    translateY(-6px);
+}
+
+.company-card::after {
+
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+
+  left: 0;
+
+  width: 100%;
+
+  height: 3px;
+
+  background:
+    var(--gradient-secondary);
+}
+
+.company-card h3 {
+
+  margin-bottom: 12px;
+
+  font-size: 1.35rem;
+}
+
+.company-card p {
+
+  margin-bottom: 20px;
+}
+
+/* ==========================================
+   MATCH SCORE
+========================================== */
+
+.company-score {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 18px;
+
+  margin-top: 20px;
+}
+
+.company-score-ring {
+
+  position: relative;
+
+  width: 90px;
+
+  height: 90px;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background:
+    radial-gradient(
+      circle,
+      var(--bg-primary) 58%,
+      transparent 60%
+    );
+}
+
+.company-score-ring::before {
+
+  content: "";
+
+  position: absolute;
+
+  inset: -4px;
+
+  border-radius: 50%;
+
+  background:
+    var(--gradient-score);
+
+  z-index: -1;
+}
+
+.company-score-ring span {
+
+  font-size: 1.2rem;
+
+  font-weight: 800;
+}
+
+/* ==========================================
+   SKILLS
+========================================== */
+
+.company-skills {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  margin-top: 20px;
+}
+
+.company-skill {
+
+  padding:
+    8px 14px;
+
+  border-radius:
+    999px;
+
+  background:
+    rgba(255,255,255,.04);
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  font-size:
+    .8rem;
+}
+
+.company-skill.matched {
+
+  border:
+    1px solid rgba(34,197,94,.25);
+
+  color:
+    var(--success-light);
+}
+
+.company-skill.missing {
+
+  border:
+    1px solid rgba(239,68,68,.25);
+
+  color:
+    var(--danger-light);
+}
+
+/* ==========================================
+   BREAKDOWN
+========================================== */
+
+.match-breakdown {
+
+  padding: 30px;
+}
+
+.match-breakdown h3 {
+
+  margin-bottom: 24px;
+}
+
+/* ==========================================
+   PROGRESS
+========================================== */
+
+.match-progress {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+.match-progress-item {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.match-progress-header {
+
+  display: flex;
+
+  justify-content: space-between;
+}
+
+.match-progress-bar {
+
+  height: 12px;
+
+  border-radius: 999px;
+
+  overflow: hidden;
+
+  background:
+    rgba(255,255,255,.05);
+}
+
+.match-progress-fill {
+
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    var(--gradient-score);
+
+  animation:
+    progressFill 1.4s ease;
+}
+
+/* ==========================================
+   COMPARISON SECTION
+========================================== */
+
+.company-comparison {
+
+  display: grid;
+
+  gap: 24px;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(320px,1fr)
+    );
+}
+
+/* ==========================================
+   COMPARISON CARD
+========================================== */
+
+.comparison-card {
+
+  padding: 28px;
+}
+
+.comparison-card h3 {
+
+  margin-bottom: 20px;
+}
+
+/* ==========================================
+   RECRUITER INSIGHTS
+========================================== */
+
+.recruiter-insights {
+
+  display: grid;
+
+  gap: 18px;
+}
+
+.recruiter-insight {
+
+  padding: 20px;
+
+  border-radius:
+    var(--radius-md);
+
+  background:
+    rgba(255,255,255,.03);
+
+  border:
+    1px solid rgba(255,255,255,.06);
+
+  transition:
+    var(--transition);
+}
+
+.recruiter-insight:hover {
+
+  border-color:
+    rgba(168,85,247,.25);
+
+  transform:
+    translateY(-3px);
+}
+
+/* ==========================================
+   AI SUGGESTIONS
+========================================== */
+
+.ai-suggestions {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+.ai-suggestion {
+
+  padding: 22px;
+
+  border-radius:
+    var(--radius-md);
+
+  background:
+    rgba(255,255,255,.03);
+
+  border:
+    1px solid rgba(255,255,255,.06);
+}
+
+.ai-suggestion h4 {
+
+  margin-bottom: 12px;
+}
+
+/* ==========================================
+   COMPANY STATS
+========================================== */
+
+.company-stats {
+
+  display: grid;
+
+  gap: 16px;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(140px,1fr)
+    );
+}
+.home-product-card{
+  max-width: 900px;
+}
+
+.home-product-card h2{
+  max-width: 850px;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+
+.home-product-card p{
+  max-width: 1000px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.75);
+}
+.company-stat {
+
+  text-align: center;
+
+  padding: 20px;
+
+  border-radius:
+    var(--radius-md);
+
+  background:
+    rgba(255,255,255,.03);
+
+  border:
+    1px solid rgba(255,255,255,.06);
+}
+
+.company-stat strong {
+
+  display: block;
+
+  font-size: 1.8rem;
+
+  margin-bottom: 8px;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1200px) {
+
+  .match-hero {
+
+    grid-template-columns: 1fr;
+
+    justify-items: center;
+
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .company-match-header {
+
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .company-grid {
+
+    grid-template-columns: 1fr;
+  }
+
+  .match-score-ring {
+
+    width: 160px;
+
+    height: 160px;
+  }
+
+  .match-score-ring span {
+
+    font-size: 2.5rem;
+  }
+}

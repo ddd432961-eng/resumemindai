@@ -1,17 +1,18 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-
+import PublicRoute from '../../components/PublicRoute'
 import Navbar from '../../components/Navbar'
 
 import {
   auth,
   googleProvider,
+  microsoftProvider,
   signInWithEmailAndPassword,
   signInWithPopup,
-  getRedirectResult
+  fetchSignInMethodsForEmail
 } from '../../lib/firebase'
 
 export default function LoginPage() {
@@ -25,23 +26,6 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    const checkRedirectLogin = async () => {
-      try {
-        const response = await getRedirectResult(auth)
-
-        if (response?.user) {
-          saveSession(response.user, 'google')
-          router.push('/dashboard')
-        }
-      } catch (error) {
-        setError(getFirebaseErrorMessage(error.code))
-      }
-    }
-
-    checkRedirectLogin()
-  }, [router])
-
   const handleChange = (event) => {
     const { name, value } = event.target
 
@@ -51,7 +35,7 @@ export default function LoginPage() {
     }))
   }
 
-  const saveSession = (firebaseUser, provider = 'email') => {
+  const saveSession = (firebaseUser, provider = 'email', forceVerified = false) => {
     const sessionUser = {
       uid: firebaseUser.uid,
       email: firebaseUser.email,
@@ -61,23 +45,17 @@ export default function LoginPage() {
         'User',
       photoURL: firebaseUser.photoURL || '',
       provider,
+      emailVerified:
+        forceVerified ||
+        provider === 'google' ||
+        provider === 'microsoft' ||
+        Boolean(firebaseUser.emailVerified),
       loggedInAt: new Date().toISOString()
     }
 
-    localStorage.setItem(
-      'resumemind_session',
-      JSON.stringify(sessionUser)
-    )
-
-    localStorage.setItem(
-      'resumemind_user_profile',
-      JSON.stringify(sessionUser)
-    )
-
-    localStorage.setItem(
-      'resumemind_user',
-      JSON.stringify(sessionUser)
-    )
+    localStorage.setItem('resumemind_session', JSON.stringify(sessionUser))
+    localStorage.setItem('resumemind_user_profile', JSON.stringify(sessionUser))
+    localStorage.setItem('resumemind_user', JSON.stringify(sessionUser))
   }
 
   const getFirebaseErrorMessage = (code) => {
@@ -85,32 +63,32 @@ export default function LoginPage() {
       return 'Please enter a valid email address.'
     }
 
-    if (code === 'auth/user-not-found') {
-      return 'No account found with this email. Please sign up first.'
-    }
-
-    if (code === 'auth/wrong-password') {
-      return 'Incorrect password. Please try again.'
-    }
-
-    if (code === 'auth/invalid-credential') {
+    if (
+      code === 'auth/user-not-found' ||
+      code === 'auth/wrong-password' ||
+      code === 'auth/invalid-credential'
+    ) {
       return 'Invalid email or password.'
     }
 
     if (code === 'auth/popup-closed-by-user') {
-      return 'Google login was cancelled. Please try again.'
+      return 'Login was cancelled. Please try again.'
     }
 
     if (code === 'auth/cancelled-popup-request') {
-      return 'Another Google popup was already opened. Please try again.'
+      return 'Another popup was already opened. Please try again.'
     }
 
     if (code === 'auth/popup-blocked') {
       return 'Popup was blocked. Please allow popups and try again.'
     }
 
+    if (code === 'auth/account-exists-with-different-credential') {
+      return 'This email is already registered with another login method. Please use the original login method.'
+    }
+
     if (code === 'auth/too-many-requests') {
-      return 'Too many attempts. Please wait and try again.'
+      return 'Too many attempts. Please wait a few minutes and try again.'
     }
 
     if (code === 'auth/network-request-failed') {
@@ -123,18 +101,45 @@ export default function LoginPage() {
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError('')
+
+    const cleanEmail = formData.email.trim().toLowerCase()
+
+    if (!cleanEmail || !formData.password) {
+      setError('Please enter email and password.')
+      return
+    }
+
     setLoading(true)
 
     try {
+      const methods = await fetchSignInMethodsForEmail(auth, cleanEmail)
+
+      if (methods.length > 0 && !methods.includes('password')) {
+        setError(
+          'This email was registered using Google or Outlook. Please use the correct login method.'
+        )
+        setLoading(false)
+        return
+      }
+
       const response = await signInWithEmailAndPassword(
         auth,
-        formData.email.trim().toLowerCase(),
+        cleanEmail,
         formData.password
       )
 
-      saveSession(response.user, 'email')
+      await response.user.reload()
+
+      saveSession(response.user, 'email', false)
+
+      if (!response.user.emailVerified) {
+        router.push('/verify-email')
+        return
+      }
+
       router.push('/dashboard')
     } catch (error) {
+      console.error('Login error:', error)
       setError(getFirebaseErrorMessage(error.code))
     } finally {
       setLoading(false)
@@ -148,24 +153,27 @@ export default function LoginPage() {
     try {
       const response = await signInWithPopup(auth, googleProvider)
 
-      saveSession(response.user, 'google')
+      saveSession(response.user, 'google', true)
       router.push('/dashboard')
     } catch (error) {
-      if (error.code === 'auth/popup-closed-by-user') {
-        setError('Google login was cancelled. Please try again.')
-        return
-      }
+      console.error('Google login error:', error)
+      setError(getFirebaseErrorMessage(error.code))
+    } finally {
+      setLoading(false)
+    }
+  }
 
-      if (error.code === 'auth/cancelled-popup-request') {
-        setError('Another Google popup was already opened. Please try again.')
-        return
-      }
+  const handleMicrosoftLogin = async () => {
+    setError('')
+    setLoading(true)
 
-      if (error.code === 'auth/popup-blocked') {
-        setError('Popup was blocked. Please allow popups and try again.')
-        return
-      }
+    try {
+      const response = await signInWithPopup(auth, microsoftProvider)
 
+      saveSession(response.user, 'microsoft', true)
+      router.push('/dashboard')
+    } catch (error) {
+      console.error('Microsoft login error:', error)
       setError(getFirebaseErrorMessage(error.code))
     } finally {
       setLoading(false)
@@ -173,130 +181,144 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="page">
-      <div className="glow one"></div>
-      <div className="glow two"></div>
-      <div className="glow three"></div>
+    <PublicRoute>
+      <main className="page">
+        <div className="glow one"></div>
+        <div className="glow two"></div>
+        <div className="glow three"></div>
 
-      <div className="container">
-        <Navbar />
+        <div className="container">
+          <Navbar />
 
-        <section className="auth-layout">
-          <div className="auth-copy">
-            <span className="eyebrow">
-              Welcome Back
-            </span>
+          <section className="auth-layout">
+            <div className="auth-copy">
+              <span className="eyebrow">
+                Welcome Back
+              </span>
 
-            <h1>
-              Continue improving your resume with AI
-            </h1>
+              <h1>
+                Login to ResumeMind AI
+              </h1>
 
-            <p>
-              Login to access your dashboard, ATS analysis, company matching,
-              resume templates, skill gap insights, and resume builder workflow.
-            </p>
+              <p>
+                Access your resume dashboard, saved reports, company matches,
+                ATS scores, and improved resume workspace.
+              </p>
 
-            <div className="auth-feature-list">
-              <span>📊 ATS Resume Score</span>
-              <span>🏢 Company Role Match</span>
-              <span>🧠 Skill Gap Detection</span>
-              <span>📄 ATS Templates</span>
+              <div className="auth-feature-list">
+                <span>📊 Resume Analytics</span>
+                <span>🎯 ATS Score Insights</span>
+                <span>📁 Saved Reports</span>
+                <span>🧠 Skill Intelligence</span>
+              </div>
             </div>
-          </div>
 
-          <div className="auth-card">
-            <span className="auth-icon">
-              🔐
-            </span>
+            <div className="auth-card">
+              <span className="auth-icon">
+                🔐
+              </span>
 
-            <h2>
-              Login
-            </h2>
+              <h2>
+                Login
+              </h2>
 
-            <p>
-              Enter your account details to open your ResumeMind AI dashboard.
-            </p>
+              <p>
+                Continue using Google, Outlook, or your verified email account.
+              </p>
 
-            {
-              error ? (
+              {error ? (
                 <div className="auth-error">
                   {error}
                 </div>
-              ) : null
-            }
-
-            <button
-              type="button"
-              className="google-login-btn"
-              onClick={handleGoogleLogin}
-              disabled={loading}
-            >
-              <span className="google-icon">
-                G
-              </span>
-
-              {loading ? 'Please wait...' : 'Continue with Google'}
-            </button>
-
-            <div className="auth-divider">
-              <span></span>
-
-              <p>
-                or login with email
-              </p>
-
-              <span></span>
-            </div>
-
-            <form onSubmit={handleSubmit} className="auth-form">
-              <div className="form-group">
-                <label>
-                  Email
-                </label>
-
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>
-                  Password
-                </label>
-
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+              ) : null}
 
               <button
-                type="submit"
-                className="button auth-submit"
+                type="button"
+                className="google-login-btn"
+                onClick={handleGoogleLogin}
                 disabled={loading}
               >
-                {loading ? 'Logging in...' : 'Login'}
-              </button>
-            </form>
+                <span className="google-icon">
+                  G
+                </span>
 
-            <p className="auth-switch">
-              Don&apos;t have an account?{' '}
-              <Link href="/signup">
-                Create account
-              </Link>
-            </p>
-          </div>
-        </section>
-      </div>
-    </main>
+                {loading ? 'Please wait...' : 'Continue with Google'}
+              </button>
+
+              <button
+                type="button"
+                className="google-login-btn"
+                onClick={handleMicrosoftLogin}
+                disabled={loading}
+                style={{ marginTop: '12px' }}
+              >
+                <span className="google-icon">
+                  M
+                </span>
+
+                {loading ? 'Please wait...' : 'Continue with Outlook'}
+              </button>
+
+              <div className="auth-divider">
+                <span></span>
+
+                <p>
+                  or login with email
+                </p>
+
+                <span></span>
+              </div>
+
+              <form onSubmit={handleSubmit} className="auth-form">
+                <div className="form-group">
+                  <label>
+                    Email
+                  </label>
+
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="example@gmail.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>
+                    Password
+                  </label>
+
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="button auth-submit"
+                  disabled={loading}
+                >
+                  {loading ? 'Logging in...' : 'Login'}
+                </button>
+              </form>
+
+              <p className="auth-switch">
+                Don&apos;t have an account?{' '}
+                <Link href="/signup">
+                  Create account
+                </Link>
+              </p>
+            </div>
+          </section>
+        </div>
+      </main>
+    </PublicRoute>
   )
 }

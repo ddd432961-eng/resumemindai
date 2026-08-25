@@ -1,0 +1,360 @@
+/* ==========================================
+   BASE BUTTON
+========================================== */
+
+.button {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  min-height: 54px;
+
+  padding: 0 28px;
+
+  border: none;
+
+  border-radius: 18px;
+
+  cursor: pointer;
+
+  font-size: .95rem;
+
+  font-weight: 600;
+
+  text-decoration: none;
+
+  white-space: nowrap;
+
+  transition: var(--transition);
+}
+
+/* ==========================================
+   PRIMARY BUTTON
+========================================== */
+
+.button-primary,
+.button {
+
+  background:
+    var(--gradient-primary);
+
+  color: white;
+
+  box-shadow:
+    0 8px 24px rgba(59,130,246,.18);
+}
+
+.button-primary:hover,
+.button:hover {
+
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 12px 30px rgba(59,130,246,.22);
+}
+
+/* ==========================================
+   HERO BUTTON
+========================================== */
+
+.button-hero {
+
+  background:
+    var(--gradient-secondary);
+
+  color: white;
+
+  min-height: 58px;
+
+  padding: 0 34px;
+
+  font-weight: 700;
+}
+
+.button-hero:hover {
+
+  transform:
+    translateY(-2px);
+}
+
+/* ==========================================
+   SECONDARY BUTTON
+========================================== */
+
+.button-secondary {
+
+  background:
+    rgba(255,255,255,.04);
+
+  color:
+    var(--text-primary);
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  backdrop-filter:
+    blur(8px);
+}
+
+.button-secondary:hover {
+
+  background:
+    rgba(255,255,255,.07);
+
+  border-color:
+    rgba(255,255,255,.12);
+
+  transform:
+    translateY(-2px);
+}
+
+/* ==========================================
+   OUTLINE BUTTON
+========================================== */
+
+.button-outline {
+
+  background:
+    transparent;
+
+  border:
+    1px solid rgba(255,255,255,.12);
+
+  color:
+    var(--text-primary);
+}
+
+.button-outline:hover {
+
+  background:
+    rgba(255,255,255,.04);
+
+  border-color:
+    rgba(139,92,246,.28);
+}
+
+/* ==========================================
+   SUCCESS
+========================================== */
+
+.button-success {
+
+  background:
+    var(--gradient-success);
+
+  color:
+    white;
+}
+
+/* ==========================================
+   DANGER
+========================================== */
+
+.button-danger {
+
+  background:
+    linear-gradient(
+      135deg,
+      #ef4444,
+      #dc2626
+    );
+
+  color:
+    white;
+}
+.primary-btn{
+  background:var(--gradient-primary);
+  color:#fff;
+}
+
+.danger-btn{
+  background:#ef4444;
+  color:#fff;
+}
+
+.danger-outline-btn{
+  border:1px solid rgba(239,68,68,.35);
+  color:#fca5a5;
+  background:transparent;
+}
+
+/* ==========================================
+   ICON BUTTON
+========================================== */
+
+.icon-btn {
+
+  width: 50px;
+
+  height: 50px;
+
+  border-radius: 16px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background:
+    rgba(255,255,255,.04);
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  transition:
+    var(--transition);
+}
+
+.icon-btn:hover {
+
+  background:
+    rgba(255,255,255,.07);
+
+  transform:
+    translateY(-2px);
+}
+
+/* ==========================================
+   QUICK ACTION
+========================================== */
+
+.quick-action-btn {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  min-height: 56px;
+
+  padding: 0 20px;
+
+  border-radius: 18px;
+
+  background:
+    rgba(255,255,255,.04);
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  transition:
+    var(--transition);
+}
+
+.quick-action-btn:hover {
+
+  background:
+    rgba(255,255,255,.07);
+
+  transform:
+    translateY(-2px);
+}
+
+/* ==========================================
+   SMALL
+========================================== */
+
+.button-sm {
+
+  min-height: 42px;
+
+  padding: 0 18px;
+
+  border-radius: 14px;
+
+  font-size: .82rem;
+}
+
+/* ==========================================
+   LARGE
+========================================== */
+
+.button-lg {
+
+  min-height: 60px;
+
+  padding: 0 36px;
+
+  font-size: 1rem;
+
+  border-radius: 20px;
+}
+
+/* ==========================================
+   BLOCK
+========================================== */
+
+.button-block {
+
+  width: 100%;
+}
+
+/* ==========================================
+   LOADING
+========================================== */
+
+.button-loading {
+
+  opacity: .8;
+
+  pointer-events: none;
+}
+
+.button-loading::after {
+
+  content: "";
+
+  width: 16px;
+
+  height: 16px;
+
+  border-radius: 50%;
+
+  border: 2px solid rgba(255,255,255,.3);
+
+  border-top-color: white;
+
+  animation:
+    spin .8s linear infinite;
+}
+
+/* ==========================================
+   HERO ACTIONS
+========================================== */
+
+.hero-actions {
+
+  display: flex;
+
+  gap: 16px;
+
+  flex-wrap: wrap;
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 768px) {
+
+  .hero-actions {
+
+    flex-direction: column;
+  }
+
+  .button,
+  .button-primary,
+  .button-secondary,
+  .button-outline {
+
+    width: 100%;
+  }
+}

@@ -1,0 +1,43 @@
+.sidebar{
+  width:280px;
+
+  padding:20px;
+
+  position:sticky;
+  top:110px;
+
+  height:fit-content;
+}
+
+.sidebar-link{
+  display:flex;
+  align-items:center;
+  gap:12px;
+
+  padding:14px 16px;
+
+  border-radius:14px;
+
+  color:var(--text-secondary);
+
+  text-decoration:none;
+
+  transition:.25s ease;
+}
+
+.sidebar-link:hover{
+  background:rgba(255,255,255,.05);
+
+  color:white;
+}
+
+.sidebar-link.active{
+  background:
+    linear-gradient(
+      135deg,
+      rgba(59,130,246,.12),
+      rgba(168,85,247,.12)
+    );
+
+  color:white;
+}

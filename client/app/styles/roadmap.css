@@ -1,0 +1,596 @@
+/* ==========================================
+   ROADMAP PAGE
+========================================== */
+
+.roadmap-page {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 32px;
+
+  padding-top: 20px;
+
+  animation:
+    fadeUp .8s ease;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.roadmap-header {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 24px;
+}
+
+.roadmap-header h1 {
+
+  font-size:
+    clamp(
+      2.5rem,
+      5vw,
+      4rem
+    );
+
+  margin-bottom: 12px;
+}
+
+.roadmap-header p {
+
+  max-width: 700px;
+}
+
+/* ==========================================
+   ROADMAP HERO
+========================================== */
+
+.roadmap-hero {
+
+  display: grid;
+
+  grid-template-columns:
+    260px
+    1fr;
+
+  gap: 40px;
+
+  padding: 40px;
+
+  border-radius:
+    var(--radius-xl);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(59,130,246,.08),
+      rgba(168,85,247,.08)
+    );
+
+  border:
+    1px solid rgba(255,255,255,.08);
+}
+
+/* ==========================================
+   PROGRESS RING
+========================================== */
+
+.roadmap-progress-ring {
+
+  position: relative;
+
+  width: 210px;
+
+  height: 210px;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background:
+    radial-gradient(
+      circle,
+      var(--bg-primary) 58%,
+      transparent 60%
+    );
+}
+
+.roadmap-progress-ring::before {
+
+  content: "";
+
+  position: absolute;
+
+  inset: -8px;
+
+  border-radius: 50%;
+
+  background:
+    var(--gradient-score);
+
+  z-index: -1;
+
+  animation:
+    rotateRing 12s linear infinite;
+}
+
+.roadmap-progress-ring span {
+
+  font-size: 3.2rem;
+
+  font-weight: 900;
+}
+
+/* ==========================================
+   HERO CONTENT
+========================================== */
+
+.roadmap-hero-content {
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+}
+
+.roadmap-hero-content h2 {
+
+  margin-bottom: 14px;
+
+  font-size: 2rem;
+}
+
+/* ==========================================
+   ACHIEVEMENT STRIP
+========================================== */
+
+.achievement-strip {
+
+  display: grid;
+
+  gap: 20px;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(180px,1fr)
+    );
+}
+
+.achievement-card {
+
+  text-align: center;
+
+  padding: 24px;
+}
+
+.achievement-icon {
+
+  width: 70px;
+
+  height: 70px;
+
+  margin: 0 auto 16px;
+
+  border-radius: 20px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background:
+    var(--gradient-secondary);
+
+  box-shadow:
+    var(--shadow-purple);
+}
+
+/* ==========================================
+   TIMELINE
+========================================== */
+
+.roadmap-timeline {
+
+  position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 28px;
+}
+
+.roadmap-timeline::before {
+
+  content: "";
+
+  position: absolute;
+
+  left: 24px;
+
+  top: 0;
+
+  bottom: 0;
+
+  width: 2px;
+
+  background:
+    linear-gradient(
+      180deg,
+      var(--blue-500),
+      var(--purple-500),
+      var(--pink-500)
+    );
+}
+
+/* ==========================================
+   TIMELINE ITEM
+========================================== */
+
+.timeline-item {
+
+  position: relative;
+
+  display: flex;
+
+  gap: 24px;
+
+  padding-left: 60px;
+}
+
+.timeline-marker {
+
+  position: absolute;
+
+  left: 14px;
+
+  top: 10px;
+
+  width: 22px;
+
+  height: 22px;
+
+  border-radius: 50%;
+
+  background:
+    var(--gradient-secondary);
+
+  box-shadow:
+    0 0 25px rgba(168,85,247,.35);
+}
+
+.timeline-item.completed .timeline-marker {
+
+  background:
+    var(--gradient-success);
+}
+
+.timeline-item.active .timeline-marker {
+
+  animation:
+    glowPulse 3s ease-in-out infinite;
+}
+
+/* ==========================================
+   TIMELINE CARD
+========================================== */
+
+.timeline-card {
+
+  width: 100%;
+
+  padding: 26px;
+}
+
+.timeline-card h3 {
+
+  margin-bottom: 10px;
+}
+
+.timeline-card p {
+
+  margin-bottom: 16px;
+}
+
+/* ==========================================
+   MILESTONES
+========================================== */
+
+.milestone-grid {
+
+  display: grid;
+
+  gap: 24px;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(320px,1fr)
+    );
+}
+
+.milestone-card {
+
+  padding: 28px;
+}
+
+.milestone-card h3 {
+
+  margin-bottom: 16px;
+}
+
+/* ==========================================
+   LEARNING PATH
+========================================== */
+
+.learning-path {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+.learning-path-item {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 18px;
+
+  padding: 18px;
+
+  border-radius:
+    var(--radius-md);
+
+  background:
+    rgba(255,255,255,.03);
+
+  border:
+    1px solid rgba(255,255,255,.06);
+
+  transition:
+    var(--transition);
+}
+
+.learning-path-item:hover {
+
+  transform:
+    translateX(8px);
+}
+
+.learning-path-icon {
+
+  width: 52px;
+
+  height: 52px;
+
+  border-radius: 14px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background:
+    rgba(255,255,255,.06);
+}
+
+/* ==========================================
+   PROGRESS TRACKER
+========================================== */
+
+.roadmap-progress-list {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+.roadmap-progress-item {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.roadmap-progress-header {
+
+  display: flex;
+
+  justify-content: space-between;
+}
+
+.roadmap-progress-bar {
+
+  width: 100%;
+
+  height: 12px;
+
+  border-radius: 999px;
+
+  overflow: hidden;
+
+  background:
+    rgba(255,255,255,.05);
+}
+
+.roadmap-progress-fill {
+
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    var(--gradient-score);
+
+  animation:
+    progressFill 1.5s ease;
+}
+
+/* ==========================================
+   AI INSIGHTS
+========================================== */
+
+.roadmap-insights {
+
+  display: grid;
+
+  gap: 18px;
+}
+
+.roadmap-insight {
+
+  padding: 22px;
+
+  border-radius:
+    var(--radius-md);
+
+  background:
+    rgba(255,255,255,.03);
+
+  border:
+    1px solid rgba(255,255,255,.06);
+
+  transition:
+    var(--transition);
+}
+
+.roadmap-insight:hover {
+
+  border-color:
+    rgba(168,85,247,.25);
+
+  transform:
+    translateY(-3px);
+}
+
+/* ==========================================
+   NEXT TARGETS
+========================================== */
+
+.next-targets {
+
+  display: grid;
+
+  gap: 20px;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(280px,1fr)
+    );
+}
+
+.target-card {
+
+  padding: 24px;
+}
+
+.target-card strong {
+
+  display: block;
+
+  margin-bottom: 12px;
+}
+
+/* ==========================================
+   BADGES
+========================================== */
+
+.achievement-badge {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding:
+    8px 14px;
+
+  border-radius:
+    999px;
+
+  background:
+    rgba(34,197,94,.15);
+
+  color:
+    var(--success-light);
+
+  font-size:
+    .8rem;
+
+  font-weight:
+    700;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1200px) {
+
+  .roadmap-hero {
+
+    grid-template-columns: 1fr;
+
+    text-align: center;
+
+    justify-items: center;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .roadmap-header {
+
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .timeline-item {
+
+    padding-left: 45px;
+  }
+
+  .roadmap-progress-ring {
+
+    width: 160px;
+
+    height: 160px;
+  }
+
+  .roadmap-progress-ring span {
+
+    font-size: 2.4rem;
+  }
+
+  .milestone-grid,
+  .next-targets {
+
+    grid-template-columns: 1fr;
+  }
+}

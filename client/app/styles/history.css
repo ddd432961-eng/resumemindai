@@ -1,0 +1,78 @@
+/* ===========================
+   ANALYSIS HISTORY
+=========================== */
+
+.history-page {
+  min-height: 100vh;
+}
+
+.history-header {
+  margin-bottom: 40px;
+}
+
+.history-grid {
+  display: grid;
+  gap: 24px;
+}
+
+.history-card {
+  padding: 28px;
+
+  background: rgba(255,255,255,.03);
+
+  border: 1px solid rgba(255,255,255,.08);
+
+  border-radius: 24px;
+
+  backdrop-filter: blur(20px);
+
+  transition: .3s ease;
+}
+
+.history-card:hover {
+  transform: translateY(-4px);
+
+  border-color: rgba(99,102,241,.25);
+}
+
+.history-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 18px;
+}
+
+.history-score {
+  width: 70px;
+  height: 70px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+  linear-gradient(
+    135deg,
+    #3b82f6,
+    #8b5cf6
+  );
+}
+
+.history-meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.history-tag {
+  padding: 8px 14px;
+
+  border-radius: 999px;
+
+  background: rgba(255,255,255,.05);
+
+  border: 1px solid rgba(255,255,255,.08);
+}

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 
 import Navbar from '../../components/Navbar'
 import AuthGuard from '../../components/AuthGuard'
-
+import '../styles/settings.css'
 export default function SettingsPage() {
   const router = useRouter()
 
